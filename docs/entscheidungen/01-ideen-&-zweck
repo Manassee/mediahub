@@ -1,0 +1,95 @@
+# 01 – Idee und Zweck
+
+Status: abgeschlossen und bestätigt
+Datum: 2026-09-09
+
+---
+
+## 1.1 Elevator Pitch
+
+Eine Medien-App für das Mediateam einer Gemeinde: Fotos und Videos, die im
+Gottesdienst entstehen, werden direkt vom iPhone auf den eigenen Server
+hochgeladen, dort automatisch nach Jahr, Monat und Datum sortiert und stehen
+allen Teammitgliedern zum Ansehen und Herunterladen zur Verfügung, wenn
+Material für ein Projekt gebraucht wird.
+
+## 1.2 Problem
+
+Heute liegt das Material verteilt auf den privaten iPhones der Teammitglieder
+und in kostenpflichtigem Cloud-Speicher bei Google oder Microsoft. Daraus
+ergeben sich drei Probleme:
+
+- **Laufende Kosten** für Cloud-Speicher, die mit der Materialmenge wachsen
+- **Voller Gerätespeicher** auf den privaten Smartphones des Teams
+- **Abhängigkeit** von externen Anbietern und deren Konditionen
+
+Ein eigener Server ist vorhanden und bietet Platz für rund zehn Jahre
+Bildmaterial. Die App macht diesen Speicher für das Team nutzbar.
+
+## 1.3 Zielgruppe
+
+Das Mediateam (MEDV) der Gemeinde – eine geschlossene, überschaubare Gruppe.
+
+- Aufnahmegeräte: ausschließlich iPhones, Modelle 12 bis 17
+- Nutzungssituation: während und nach dem Gottesdienst, sowie ortsunabhängig
+  von zu Hause aus bei der Projektarbeit
+- Kein öffentlicher Zugang, keine Selbstregistrierung erwartet
+
+## 1.4 Kernablauf
+
+1. Aufnahme entstehen – mit der iPhone-Kamera oder direkt in der App
+2. Medien in der App auswählen und in den passenden Ordner hochladen
+3. Upload läuft, Fortschritt ist sichtbar, Ablage erfolgt automatisch sortiert
+   nach Jahr → Monat → Datum
+4. Bei Bedarf: Material in der App suchen, ansehen und auf das Gerät
+   herunterladen
+
+## 1.5 Warum nativ mobil?
+
+- **Kamerazugriff** für Aufnahmen direkt aus der App
+- **Zugriff auf die Fotomediathek** zum Auswählen bereits aufgenommener Medien
+- **Push Notifications** bei abgeschlossenen Uploads, neuen Uploads anderer
+  Teammitglieder und bei Fehlern
+- **Hintergrund-Uploads**, da Videos groß sind und der Upload nicht abbrechen
+  darf, wenn die App in den Hintergrund geht
+- **Speichern in die Fotomediathek** beim Download
+- Optional: **Chatfunktion** für die Abstimmung im Team
+
+## 1.6 Abgrenzung
+
+Die App ist ausdrücklich **nicht**:
+
+- kein Videoschnitt- oder Bildbearbeitungswerkzeug – bearbeitet wird weiterhin
+  am Rechner
+- kein öffentliches Portal – kein Zugang für Gemeindemitglieder außerhalb des
+  Mediateams, kein Teilen nach außen per Link
+- kein Livestreaming-Werkzeug
+- kein allgemeiner Dateispeicher für Dokumente, PDFs oder Präsentationen
+- keine Web-Oberfläche in der ersten Version
+- keine Ablösung bestehender Gemeinde-Software
+
+## 1.7 Erfolgskriterium
+
+Nach sechs Monaten gilt die App als erfolgreich, wenn:
+
+- alle im Gottesdienst entstandenen Fotos und Videos vollständig und korrekt
+  nach Datum sortiert auf dem eigenen Server liegen
+- Downloads auf das Gerät zuverlässig und ohne Abbrüche funktionieren
+- das Team keinen externen Cloud-Speicher mehr für Gottesdienstmaterial nutzt
+
+---
+
+## Technische Konsequenzen aus diesem Kapitel
+
+Punkte, die die App maßgeblich prägen und in den folgenden Kapiteln vertieft
+werden:
+
+| Thema | Konsequenz |
+|---|---|
+| Dateigrößen | 4K-Video vom iPhone erzeugt schnell mehrere hundert MB pro Minute. Einfacher Multipart-Upload reicht nicht – nötig ist ein fortsetzbarer Chunk-Upload. |
+| iPhone-Formate | HEIC und HEVC. Es muss festgelegt werden, ob im Original gespeichert oder zusätzlich in JPEG/H.264 konvertiert wird. |
+| Sortierung | Die Einordnung muss aus den Aufnahme-Metadaten (EXIF / QuickTime) kommen, nicht aus dem Upload-Zeitpunkt. Fallback bei fehlenden Metadaten nötig. |
+| Vorschaubilder | Ohne serverseitig erzeugte Thumbnails ist eine Galerie auf dem Handy unbrauchbar. |
+| Speicherarchitektur | Dateien gehören nicht in PostgreSQL. Die Datenbank hält nur Metadaten, die Dateien liegen im Dateisystem oder in S3-kompatiblem Object Storage. |
+| Zugang | Geschlossenes Team ohne Social Login – Nutzer werden vom Admin eingeladen. Damit ist ein einfacher Auth-Weg ausreichend (siehe Kapitel 0). |
+| Duplikate | Dasselbe Video wird leicht von zwei Teammitgliedern hochgeladen. Erkennung über Hash sollte eingeplant werden. |
